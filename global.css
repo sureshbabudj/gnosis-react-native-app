@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: hsl(0, 0%, 96%);
+    --foreground: hsl(240 10% 3.9%);
+
+    --card: hsl(0, 0%, 100%);
+    --card-foreground: hsl(240 10% 3.9%);
+
+    --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(240 10% 3.9%);
+
+    --primary: hsl(299, 83%, 29%);
+    --primary-foreground: hsl(308, 100%, 91%);
+
+    --secondary: hsl(240 4.8% 95.9%);
+    --secondary-foreground: hsl(240 5.9% 10%);
+
+    --muted: hsl(240 4.8% 95.9%);
+    --muted-foreground: hsl(240 3.8% 46.1%);
+
+    --accent: hsl(240 4.8% 95.9%);
+    --accent-foreground: hsl(240 5.9% 10%);
+
+    --destructive: hsl(0 84.2% 60.2%);
+    --destructive-foreground: hsl(0 0% 98%);
+
+    --border: hsl(0, 0%, 79%);
+    --input: hsl(240 5.9% 90%);
+    --ring: hsl(240 10% 3.9%);
+
+    --radius: 1.5rem;
+  }
+
+  .dark {
+    --background: hsl(240 10% 3.9%);
+    --foreground: hsl(0 0% 98%);
+
+    --card: hsl(240 10% 3.9%);
+    --card-foreground: hsl(0 0% 98%);
+
+    --popover: hsl(240 10% 3.9%);
+    --popover-foreground: hsl(0 0% 98%);
+
+    --primary: hsl(0 0% 98%);
+    --primary-foreground: hsl(240 5.9% 10%);
+
+    --secondary: hsl(240 3.7% 15.9%);
+    --secondary-foreground: hsl(0 0% 98%);
+
+    --muted: hsl(240 3.7% 15.9%);
+    --muted-foreground: hsl(240 5% 64.9%);
+
+    --accent: hsl(240 3.7% 15.9%);
+    --accent-foreground: hsl(0 0% 98%);
+
+    --destructive: hsl(0 62.8% 30.6%);
+    --destructive-foreground: hsl(0 0% 98%);
+
+    --border: hsl(240 3.7% 15.9%);
+    --input: hsl(240 3.7% 15.9%);
+    --ring: hsl(240 4.9% 83.9%);
+  }
+}
+
+@layer utilities {
+  .font-thin {
+    font-family: "FiraSans_100Thin";
+  }
+
+  .font-extralight {
+    font-family: "FiraSans_200ExtraLight";
+  }
+
+  .font-light {
+    font-family: "FiraSans_300Light";
+  }
+
+  .font-normal {
+    font-family: "FiraSans_400Regular";
+  }
+
+  .font-medium {
+    font-family: "FiraSans_500Medium";
+  }
+
+  .font-semibold {
+    font-family: "FiraSans_600SemiBold";
+  }
+
+  .font-bold {
+    font-family: "FiraSans_700Bold";
+  }
+
+  .font-extrabold {
+    font-family: "FiraSans_800ExtraBold";
+  }
+
+  .font-black {
+    font-family: "FiraSans_900Black";
+  }
+
+  /* Italic versions */
+  .font-thin.italic {
+    font-family: "FiraSans_100Thin_Italic";
+  }
+
+  .font-extralight.italic {
+    font-family: "FiraSans_200ExtraLight_Italic";
+  }
+
+  .font-light.italic {
+    font-family: "FiraSans_300Light_Italic";
+  }
+
+  .font-normal.italic {
+    font-family: "FiraSans_400Regular_Italic";
+  }
+
+  .font-medium.italic {
+    font-family: "FiraSans_500Medium_Italic";
+  }
+
+  .font-semibold.italic {
+    font-family: "FiraSans_600SemiBold_Italic";
+  }
+
+  .font-bold.italic {
+    font-family: "FiraSans_700Bold_Italic";
+  }
+
+  .font-extrabold.italic {
+    font-family: "FiraSans_800ExtraBold_Italic";
+  }
+
+  .font-black.italic {
+    font-family: "FiraSans_900Black_Italic";
+  }
+
+  /* Default font families */
+  .font-sans {
+    font-family: "FiraSans_400Regular";
+  }
+
+  .font-serif {
+    font-family: "Alice_400Regular";
+  }
+
+  .font-mono {
+    font-family: "FiraSans_400Regular";
+  }
+}

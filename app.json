@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Gnosis",
+    "slug": "gnosis-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/ios-dark.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash-light.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./assets/splash-dark.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      }
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sureshbabudj.gnosis",
+      "icon": "./assets/ios-light.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sureshbabudj.gnosis"
+    },
+    "web": {
+      "favicon": "./assets/ios-light.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
