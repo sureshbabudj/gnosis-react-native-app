@@ -1,0 +1,8 @@
+# Ignore files and directories here
+/node_modules
+/ios
+/android
+/web-build
+/dist
+/build
+.expo/

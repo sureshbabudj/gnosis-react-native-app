@@ -1,26 +1,31 @@
-import React, { useState, JSX, useRef } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import theme from 'lib/theme';
+import React, { JSX, useRef, useState } from 'react';
 import {
-  View,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { AuthScreenProps } from "types";
-import { AuthLogo } from "./auth-logo";
-import { useAuth } from "./auth-provider";
+  View,
+} from 'react-native';
+import { useFlashcardStore } from 'stores/translation-store';
+import { AuthScreenProps } from 'types';
+
+import { AuthLogo } from './auth-logo';
+import { useAuth } from './auth-provider';
 
 export function SignUpScreen({
   navigation,
-}: AuthScreenProps<"SignUp">): JSX.Element {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+}: AuthScreenProps<'SignUp'>): JSX.Element {
+  const { theme: selectedTheme } = useFlashcardStore();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signUp } = useAuth();
 
   const emailRef = useRef<TextInput>(null);
@@ -29,23 +34,23 @@ export function SignUpScreen({
 
   const handleSignUp = async () => {
     if (!name || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     if (!agreeTerms) {
-      Alert.alert("Error", "Please agree to the terms and conditions");
+      Alert.alert('Error', 'Please agree to the terms and conditions');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+      Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address");
+      Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 
@@ -111,29 +116,38 @@ export function SignUpScreen({
               <Text className="text-sm font-medium text-foreground mb-2">
                 Password
               </Text>
-              <TextInput
-                ref={passwordRef} // Attach ref
-                className="w-full px-4 py-3 border border-border rounded-lg bg-card text-foreground"
-                placeholder="Enter your password (min 6 characters)"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry // Hide password characters
-                textContentType="newPassword" // iOS autofill
-                autoComplete="new-password" // Android autofill
-                returnKeyType="next" // Show 'Next' button
-                blurOnSubmit={true}
-              />
+              <View className="relative">
+                <TextInput
+                  ref={passwordRef} // Attach ref
+                  className="w-full px-4 py-3 pr-12 border border-border rounded-lg bg-card text-foreground"
+                  placeholder="Enter your password (min 6 characters)"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword} // Toggle visibility
+                  textContentType="newPassword" // iOS autofill
+                  autoComplete="new-password" // Android autofill
+                  returnKeyType="next" // Show 'Next' button
+                  blurOnSubmit={true}
+                />
+                <TouchableOpacity
+                  className="absolute right-0 top-0 z-10 w-12 h-12 flex items-center justify-center rounded-full"
+                  onPress={() => setShowPassword(v => !v)}>
+                  <Ionicons
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={20}
+                    color={theme[selectedTheme].primary}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <TouchableOpacity
               className="flex-row items-center mt-4"
-              onPress={() => setAgreeTerms(!agreeTerms)}
-            >
+              onPress={() => setAgreeTerms(!agreeTerms)}>
               <View
                 className={`w-5 h-5 border-2 rounded mr-3 items-center justify-center ${
-                  agreeTerms ? "bg-primary border-primary" : "border-border"
-                }`}
-              >
+                  agreeTerms ? 'bg-primary border-primary' : 'border-border'
+                }`}>
                 {agreeTerms && (
                   <Ionicons name="checkmark" size={12} color="white" />
                 )}
@@ -145,21 +159,20 @@ export function SignUpScreen({
 
             <TouchableOpacity
               className={`w-full py-3 rounded-lg mt-6 ${
-                loading ? "bg-muted" : "bg-primary"
+                loading ? 'bg-muted' : 'bg-primary'
               }`}
               onPress={handleSignUp}
-              disabled={loading}
-            >
+              disabled={loading}>
               <Text className="text-primary-foreground text-center font-semibold text-lg">
-                {loading ? "Creating Account..." : "Sign Up"}
+                {loading ? 'Creating Account...' : 'Sign Up'}
               </Text>
             </TouchableOpacity>
 
             <View className="flex-row justify-center mt-6">
               <Text className="text-muted-foreground">
-                Already have an account?{" "}
+                Already have an account?{' '}
               </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+              <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
                 <Text className="text-primary font-semibold">Sign In</Text>
               </TouchableOpacity>
             </View>

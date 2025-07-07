@@ -6,6 +6,11 @@ node_modules/
 .expo-shared/
 web-build/
 dist/
+.expo-go/
+.expo-packager/
+.expo-cache/
+.expo-updates/
+.expo-dev-client/
 
 # macOS
 .DS_Store

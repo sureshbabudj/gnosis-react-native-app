@@ -1,22 +1,23 @@
 import {
-  clearCurrentUser,
-  generateUserId,
-  getCurrentUser,
-  getUsers,
-  hashPassword,
-  saveCurrentUser,
-  saveUser,
-  verifyPassword,
-} from "lib/storage";
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  updateProfile,
+  User as FirebaseUser,
+} from 'firebase/auth';
 import React, {
-  useState,
-  useEffect,
+  createContext,
   JSX,
   useContext,
-  createContext,
-} from "react";
-import { Alert } from "react-native";
-import { AuthContextType, User } from "types";
+  useEffect,
+  useState,
+} from 'react';
+import { Alert } from 'react-native';
+import type { AuthContextType, User as AppUser } from 'types';
+
+import { auth } from '../firebase.config';
+import { useFlashcardStore } from '../stores/translation-store';
 
 // Create Auth Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,49 +27,47 @@ export function AuthProvider({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkCurrentUser = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error("Error checking current user:", error);
-      } finally {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser: FirebaseUser | null) => {
+        if (firebaseUser) {
+          setUser({
+            id: firebaseUser.uid,
+            name:
+              firebaseUser.displayName ||
+              firebaseUser.email?.split('@')[0] ||
+              '',
+            email: firebaseUser.email || '',
+            passwordHash: '', // Not available from Firebase
+            createdAt: firebaseUser.metadata.creationTime || '',
+          });
+          // Subscribe to Firestore after user is authenticated
+          useFlashcardStore.getState().subscribeToFirestore?.();
+        } else {
+          setUser(null);
+          // Optionally unsubscribe from Firestore on logout
+          useFlashcardStore.getState().unsubscribeFromFirestore?.();
+        }
         setLoading(false);
-      }
+      },
+    );
+    return () => {
+      unsubscribe();
+      useFlashcardStore.getState().unsubscribeFromFirestore?.();
     };
-    checkCurrentUser();
   }, []);
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
-      const users = await getUsers();
-      const foundUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
-
-      if (!foundUser) {
-        Alert.alert("Error", "User not found");
-        return false;
-      }
-      const isValidPassword = await verifyPassword(
-        password,
-        foundUser.passwordHash
-      );
-      if (!isValidPassword) {
-        Alert.alert("Error", "Invalid password");
-        return false;
-      }
-
-      await saveCurrentUser(foundUser);
-      setUser(foundUser);
+      await signInWithEmailAndPassword(auth, email, password);
       return true;
-    } catch (error) {
-      Alert.alert("Error", "Sign in failed");
-      console.error("Sign in error:", error);
+    } catch (error: any) {
+      console.log('[AuthProvider] signIn error', error);
+      Alert.alert('Error', error.message || 'Sign in failed');
       return false;
     }
   };
@@ -76,50 +75,34 @@ export function AuthProvider({
   const signUp = async (
     name: string,
     email: string,
-    password: string
+    password: string,
   ): Promise<boolean> => {
     try {
-      const users = await getUsers();
-      const existingUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
-
-      if (existingUser) {
-        Alert.alert("Error", "User already exists");
-        return false;
-      }
-
-      const userId = generateUserId();
-      const passwordHash = await hashPassword(password);
-
-      const newUser: User = {
-        id: userId,
-        name,
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         email,
-        passwordHash,
-        createdAt: new Date().toISOString(),
-      };
-
-      await saveUser(newUser);
-      await saveCurrentUser(newUser);
-      setUser(newUser);
-      Alert.alert("Success", "Account created successfully!");
+        password,
+      );
+      // Set displayName immediately after user creation
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+      }
+      Alert.alert('Success', 'Account created successfully!');
       return true;
-    } catch (error) {
-      Alert.alert("Error", "Sign up failed");
-      console.error("Sign up error:", error);
+    } catch (error: any) {
+      console.log('[AuthProvider] signUp error', error);
+      Alert.alert('Error', error.message || 'Sign up failed');
       return false;
     }
   };
 
   const signOut = async (): Promise<void> => {
     try {
-      await clearCurrentUser();
-      setUser(null);
-      Alert.alert("Success", "Signed out successfully");
-    } catch (error) {
-      Alert.alert("Error", "Sign out failed");
-      console.error("Sign out error:", error);
+      await firebaseSignOut(auth);
+      Alert.alert('Success', 'Signed out successfully');
+    } catch (error: any) {
+      console.log('[AuthProvider] signOut error', error);
+      Alert.alert('Error', error.message || 'Sign out failed');
     }
   };
 
@@ -138,7 +121,7 @@ export function AuthProvider({
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

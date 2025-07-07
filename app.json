@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Gnosis",
-    "slug": "gnosis-app",
+    "name": "VocabFlip AI",
+    "slug": "vocabflipai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/ios-dark.png",
@@ -21,7 +21,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sureshbabudj.gnosis",
+      "bundleIdentifier": "com.sureshbabudj.vocabflipai",
       "icon": "./assets/ios-light.png"
     },
     "android": {
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sureshbabudj.gnosis"
+      "package": "com.sureshbabudj.vocabflipai"
     },
     "web": {
       "favicon": "./assets/ios-light.png",
@@ -37,6 +37,13 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "GEMINI_API_KEY": "AIzaSyA1GeJAWPZX2qDmzWzWP-VSktkLKg8Q8f0",
+      "eas": {
+        "projectId": "16166482-b649-4280-8044-0a3972a438c4"
+      }
+    },
+    "owner": "sureshbabudj"
   }
 }

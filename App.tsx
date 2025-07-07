@@ -1,23 +1,11 @@
-import "./global.css";
-
-import React, { JSX } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import 'react-native-gesture-handler';
+import './global.css';
 
 import {
   Alice_400Regular,
   useFonts as useAliceFonts,
-} from "@expo-google-fonts/alice";
+} from '@expo-google-fonts/alice';
 import {
-  RopaSans_400Regular,
-  RopaSans_400Regular_Italic,
-  useFonts as useRopaSansFonts,
-} from "@expo-google-fonts/ropa-sans";
-import {
-  useFonts as useFiraSansFonts,
   FiraSans_100Thin,
   FiraSans_100Thin_Italic,
   FiraSans_200ExtraLight,
@@ -36,65 +24,103 @@ import {
   FiraSans_800ExtraBold_Italic,
   FiraSans_900Black,
   FiraSans_900Black_Italic,
-} from "@expo-google-fonts/fira-sans";
-import { LoadingScreen } from "components/loading";
-import { AuthProvider, useAuth } from "components/auth-provider";
-import { HomeScreen } from "components/home";
-import { ProfileScreen } from "components/profile";
-import { SettingsScreen } from "components/settings";
-import { ExploreScreen } from "components/explore";
-import { CustomTabBar } from "components/custom-toolbar";
-import { AuthStackParamList, RootTabParamList } from "types";
-import { SignInScreen } from "components/signin";
-import { SignUpScreen } from "components/signup";
+  useFonts as useFiraSansFonts,
+} from '@expo-google-fonts/fira-sans';
+import {
+  RopaSans_400Regular,
+  RopaSans_400Regular_Italic,
+  useFonts as useRopaSansFonts,
+} from '@expo-google-fonts/ropa-sans';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StudyPerformanceScreen } from 'components/details';
+import { GlanceScreen } from 'components/glance';
+import { HomeScreen } from 'components/home';
+import { LoadingScreen } from 'components/loading';
+import { StatusBar } from 'expo-status-bar';
+import theme from 'lib/theme';
+import React from 'react';
+import { View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from 'react-native-reanimated';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useFlashcardStore } from 'stores/translation-store';
 
-// Create navigators
-const AuthStack = createNativeStackNavigator<AuthStackParamList>();
-const Tab = createBottomTabNavigator<RootTabParamList>();
+import { AuthProvider, useAuth } from './components/auth-provider';
+import { CustomTabBar } from './components/custom-toolbar';
+import { ProfileScreen } from './components/profile';
+import { SignInScreen } from './components/signin';
+import { SignUpScreen } from './components/signup';
 
-function AuthNavigator(): JSX.Element {
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: true, // Reanimated runs in strict mode by default
+});
+
+// --- Navigation Setup ---
+const AuthStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function AuthNavigator() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="SignIn" component={SignInScreen} />
-      <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStack.Screen name="SignIn" component={SignInScreen as any} />
+      <AuthStack.Screen name="SignUp" component={SignUpScreen as any} />
     </AuthStack.Navigator>
   );
 }
 
-// Main Tab Navigator
-function MainNavigator(): JSX.Element {
+function MainNavigator() {
+  const { theme: selectedTheme } = useFlashcardStore();
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
+      tabBar={props => CustomTabBar({ selectedTheme, ...props })}
+      screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Glance" component={GlanceScreen} />
+      <Tab.Screen name="Progress" component={StudyPerformanceScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="Explore" component={ExploreScreen} />
     </Tab.Navigator>
   );
 }
 
-// App Navigation Component
-function AppNavigation(): JSX.Element {
-  const { user, loading } = useAuth();
+function ThemeRoot({ children }: { children: React.ReactNode }) {
+  const { theme: selectedTheme } = useFlashcardStore();
+  // Pick background color from your theme object
+  const backgroundColor = theme[selectedTheme]?.background || '#fff';
+  return (
+    <View
+      className={`flex-1 ${selectedTheme === 'dark' ? 'dark' : 'light'}`}
+      style={{ backgroundColor }}>
+      <StatusBar
+        style={selectedTheme === 'dark' ? 'light' : 'dark'}
+        backgroundColor={backgroundColor}
+      />
+      {children}
+    </View>
+  );
+}
 
+function AppNavigation() {
+  const { user, loading } = useAuth();
   if (loading) {
     return <LoadingScreen />;
   }
-
   return (
     <NavigationContainer>
-      {user ? <MainNavigator /> : <AuthNavigator />}
+      <SafeAreaView className={`flex-1 bg-background`}>
+        {user ? <MainNavigator /> : <AuthNavigator />}
+      </SafeAreaView>
     </NavigationContainer>
   );
 }
 
-// Main App Component
-export default function App(): JSX.Element {
+export default function App() {
   const [isFiraSansLoaded, firaSansErr] = useFiraSansFonts({
     FiraSans_100Thin,
     FiraSans_100Thin_Italic,
@@ -115,11 +141,9 @@ export default function App(): JSX.Element {
     FiraSans_900Black,
     FiraSans_900Black_Italic,
   });
-
   const [isAliceLoaded, aliceError] = useAliceFonts({
     Alice_400Regular,
   });
-
   const [isRopaSansLoaded, ropaSansError] = useRopaSansFonts({
     RopaSans_400Regular,
     RopaSans_400Regular_Italic,
@@ -137,12 +161,14 @@ export default function App(): JSX.Element {
   }
 
   return (
-    <AuthProvider>
-      <SafeAreaProvider>
-        <SafeAreaView className="flex-1 bg-white">
-          <AppNavigation />
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <ThemeRoot>
+        <GestureHandlerRootView className="flex-1">
+          <AuthProvider>
+            <AppNavigation />
+          </AuthProvider>
+        </GestureHandlerRootView>
+      </ThemeRoot>
+    </SafeAreaProvider>
   );
 }

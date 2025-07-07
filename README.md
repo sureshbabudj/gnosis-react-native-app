@@ -1,4 +1,4 @@
-# Gnosis App
+# VocabFlip AI Mobile App
 
 A modern Expo React Native app with authentication, theming, and custom fonts.
 

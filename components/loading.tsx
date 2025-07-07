@@ -1,6 +1,7 @@
-import { JSX } from "react";
-import { Text, View } from "react-native";
-import { AuthLogo } from "./auth-logo";
+import { JSX } from 'react';
+import { Text, View } from 'react-native';
+
+import { AuthLogo } from './auth-logo';
 
 export function LoadingScreen(): JSX.Element {
   return (
